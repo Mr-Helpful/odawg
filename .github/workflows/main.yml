@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   push:
     paths:
+      # run when actions or source code are changed
+      - .github/workflows
       - src/**
   pull_request:
     branches: ["main"]
