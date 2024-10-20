@@ -31,7 +31,7 @@ jobs:
         id: cache_key
         run: |
           echo "
-          key='${{ runner.os }}-build-${{ hashFiles("**/Cargo.lock") }}-${{ hashFiles("src/**") }}'
+          key='${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}'
           " >> $GITHUB_OUTPUT
 
       - name: Cache Build
