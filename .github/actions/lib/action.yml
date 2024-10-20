@@ -15,3 +15,4 @@ runs:
     - name: Build
       if: steps.cache.outputs.cache-hit != 'true'
       run: cargo build --verbose
+      shell: bash
