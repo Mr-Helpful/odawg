@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Build
-        uses: .github/actions/lib
+        uses: ./.github/actions/lib
 
   # Tests the ODAWG library
   test:
@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Build
-        uses: .github/actions/lib
+        uses: ./.github/actions/lib
 
       - name: Test
         run: cargo test
