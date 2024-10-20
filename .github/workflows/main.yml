@@ -38,4 +38,23 @@ jobs:
         uses: ./.github/actions/lib
 
       - name: Test
-        run: cargo test
+        # we run testing seperately as it can be done without rebuilding
+        # whilst `cargo tarpaulin` does tests, it often needs to rebuild
+        # the entire library due to using vastly different compiler flags
+        #
+        # doing it this way allows testing to fail quickly if a test fails
+        run: cargo test --tests
+
+      - name: Install `cargo tarpaulin`
+        uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: cargo-tarpaulin
+
+      - name: Coverage
+        run: cargo tarpaulin --out=Html
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: Coverage Report
+          path: ./tarpaulin-report.html
