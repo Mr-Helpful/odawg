@@ -20,7 +20,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      key: ${{ steps.outputs.cache_key.key }}
+      key: ${{ steps.cache_key.outputs.key }}
 
     steps:
       - name: Checkout
@@ -39,7 +39,7 @@ jobs:
         id: cache
         with:
           path: target/
-          key: ${{ steps.outputs.cache_key.key }}
+          key: ${{ steps.cache_key.outputs.key }}
 
       - name: Build
         if: steps.cache.outputs.cache-hit != 'true'
