@@ -5,9 +5,6 @@ author: Mr-Helpful
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
     - id: cache
       name: Cache Build
       uses: actions/cache@v4
