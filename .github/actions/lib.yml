@@ -1,0 +1,20 @@
+name: ODAWG
+description: Builds the source code for the ODAWG library
+author: Mr-Helpful
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - id: cache
+      name: Cache Build
+      uses: actions/cache@v4
+      with:
+        path: target/
+        key: ${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
+
+    - name: Build
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: cargo build --verbose

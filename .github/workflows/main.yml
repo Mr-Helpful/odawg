@@ -1,4 +1,4 @@
-name: Rust
+name: Main
 
 on:
   workflow_dispatch:
@@ -19,31 +19,10 @@ jobs:
   # Run Cargo build step and cache for later
   build:
     runs-on: ubuntu-latest
-    outputs:
-      key: ${{ steps.cache_key.outputs.key }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - # by generating the cache key, we can reference it in dependencies
-        name: Generate Cache Key
-        id: cache_key
-        run: |
-          echo "
-          key='${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}'
-          " >> $GITHUB_OUTPUT
-
-      - name: Cache Build
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: target/
-          key: ${{ steps.cache_key.outputs.key }}
-
       - name: Build
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: cargo build --verbose
+        uses: .github/actions/lib
 
   # Tests the ODAWG library
   test:
@@ -51,15 +30,8 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Fetch Build
-        uses: actions/cache@v4
-        id: cache
-        with:
-          path: target/
-          key: ${{ needs.build.outputs.key }}
+      - name: Build
+        uses: .github/actions/lib
 
       - name: Test
-        run: cargo test --verbose
+        run: cargo test
