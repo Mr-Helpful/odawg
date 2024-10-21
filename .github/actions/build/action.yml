@@ -10,9 +10,11 @@ runs:
       uses: actions/cache@v4
       with:
         path: target/
-        key: ${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
+        key: Build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
 
     - name: Build
       if: steps.cache.outputs.cache-hit != 'true'
-      run: cargo build --verbose
+      run: |
+        cargo build --verbose
+        cargo build --release --verbose
       shell: bash

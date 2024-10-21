@@ -24,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        uses: ./.github/actions/lib
+        uses: ./.github/actions/build
 
   # Tests the ODAWG library
   test:
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build
-        uses: ./.github/actions/lib
+        uses: ./.github/actions/build
 
       - name: Test
         # we run testing seperately as it can be done without rebuilding
