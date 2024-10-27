@@ -52,6 +52,11 @@ impl ReadNode for ThinNode {
     let masked = self.mask & ((1 << i) - 1);
     self.idx + (masked.count_ones() as Self::Idx)
   }
+
+  fn next_c(&self, c: u8) -> Option<u8> {
+    let masked = self.mask & ((1 << c) - 1);
+    (masked > 0).then(|| masked.count_zeros() as u8)
+  }
 }
 
 #[derive(Clone, Debug)]
