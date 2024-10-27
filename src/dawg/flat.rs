@@ -4,15 +4,63 @@ use super::{
 };
 
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, hash::Hash};
+use std::{
+  collections::HashMap,
+  fmt::{Display, Write},
+  hash::Hash,
+};
 
 /// A DAWG stored in a flattened list, where nodes store indexes
 #[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct FlatDawg<N>(pub(crate) Vec<N>);
+pub struct FlatDawg<N = WideNode>(pub Vec<N>);
 
 impl<N: Default> Default for FlatDawg<N> {
   fn default() -> Self {
     Self(vec![Default::default()])
+  }
+}
+
+impl<N: Display> Display for FlatDawg<N> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let pad = (self.0.len() as f64).log10().ceil() as usize;
+    for (i, node) in self.0.iter().enumerate() {
+      if i > 0 {
+        f.write_char('\n')?;
+      }
+      write!(f, "{i: >pad$} {node}")?;
+    }
+    Ok(())
+  }
+}
+
+impl<N: ReadNode<Idx = usize>> FlatDawg<N> {
+  /// Returns whether the DAWG has a cycle in it.<br>
+  /// This can and **should** be used to catch errors.
+  pub fn is_cyclic(&self) -> bool {
+    let mut path = vec![];
+    let mut idx = Self::ROOT_IDX;
+    let mut keys: Vec<_> = self.index(Self::ROOT_IDX).keys().collect();
+
+    loop {
+      if let Some(&key) = keys.first() {
+        // we've seen this node in the path => cycle!
+        if path.iter().any(|&(i, _)| i == idx) {
+          return true;
+        }
+
+        path.push((idx, keys));
+        idx = self.index(idx).get(key);
+        keys = self.index(idx).keys().collect();
+        continue;
+      }
+
+      // last item empty => backtrack
+      let Some(item) = path.pop() else { break };
+      (idx, keys) = item;
+      keys.pop(); // we've fully explored this branch, remove it.
+    }
+
+    false
   }
 }
 
@@ -67,38 +115,43 @@ mod write {
 
     /// Helper function to call `f(idx, node, word)` every time a<br>
     /// depth first search would backtrack to a node `node`.
-    pub(crate) fn on_backtrack(&mut self, mut f: impl FnMut(usize, &mut N, &[u8])) {
+    pub(crate) fn on_backtrack(&mut self, mut f: impl FnMut(usize, &mut N, &[u8]))
+    where
+      N: Clone,
+    {
       let mut word = vec![0];
-      let mut stack = vec![0];
+      let mut stack = vec![(Self::ROOT_IDX, self.index(Self::ROOT_IDX).clone())];
 
-      while let Some((idx, c)) = stack.pop().zip(word.pop()) {
-        let node = self.index_mut(idx);
-        if let Some(c) = node.next_c(c) {
+      while let Some((idx, mut node)) = stack.pop() {
+        word.pop();
+
+        if let Some((c, c_idx)) = node.pop() {
           word.push(c);
-          stack.push(idx);
+          stack.push((idx, node));
           word.push(0);
-          stack.push(node.get(c));
+          stack.push((c_idx, self.index(c_idx).clone()));
         } else {
           // no nodes left to explore on current node
           // => we're currently backtracking
-          f(idx, node, &word);
-          continue;
+          f(idx, self.index_mut(idx), &word);
         };
       }
     }
   }
 
-  impl<N: WriteNode<Idx = usize> + Default> WriteDawg for FlatDawg<N> {
+  impl<N: WriteNode<Idx = usize> + Default + Clone> WriteDawg for FlatDawg<N> {
     fn add(&mut self, word: &impl AsRef<[u8]>) -> bool {
       let word = word.as_ref();
 
       let mut idx = 0;
       for &c in word {
         let node = self.index(idx);
-        idx = node.get(c);
-        if idx == 0 {
-          idx = self.insert();
+        if node.get(c) == 0 {
+          let n_idx = self.insert();
+          let node = self.index_mut(idx);
+          *node.get_mut(c) = n_idx;
         }
+        idx = self.index(idx).get(c);
       }
 
       std::mem::replace(self.index_mut(idx).is_end_mut(), true)
@@ -115,7 +168,7 @@ mod write {
           if !self.index(idx0).has(c) {
             *self.index_mut(idx0).get_mut(c) = self.insert();
           }
-          stack.push((self.index(idx0).get(c), idx))
+          stack.push((self.index(idx0).get(c), idx));
         }
       }
     }
@@ -145,7 +198,7 @@ mod write {
         let pairs: Vec<_> = node0.pairs().collect();
         for (c, idx) in pairs {
           if node1.has(c) {
-            stack.push((idx, node1.get(c)))
+            stack.push((idx, node1.get(c)));
           }
         }
       }
@@ -154,9 +207,9 @@ mod write {
     fn keep(&mut self, f: impl Fn(&[u8]) -> bool) {
       self.on_backtrack(|_, node, word| {
         if node.is_end() {
-          *node.is_end_mut() = f(word)
+          *node.is_end_mut() = f(word);
         }
-      })
+      });
     }
 
     fn intersect<D: ReadDawg>(&mut self, dawg: &D) {
@@ -170,22 +223,22 @@ mod write {
         let pairs: Vec<_> = node0.pairs().collect();
         for (c, idx) in pairs {
           if node1.has(c) {
-            stack.push((idx, node1.get(c)))
+            stack.push((idx, node1.get(c)));
           } else {
-            *node0.get_mut(c) = 0
+            *node0.get_mut(c) = 0;
           }
         }
       }
     }
   }
 
-  impl<W: AsRef<[u8]>, N: WriteNode<Idx = usize> + Default> Extend<W> for FlatDawg<N> {
+  impl<W: AsRef<[u8]>, N: WriteNode<Idx = usize> + Default + Clone> Extend<W> for FlatDawg<N> {
     fn extend<T: IntoIterator<Item = W>>(&mut self, iter: T) {
       self.add_all(iter);
     }
   }
 
-  impl<W: AsRef<[u8]>, N: WriteNode<Idx = usize> + Default> FromIterator<W> for FlatDawg<N> {
+  impl<W: AsRef<[u8]>, N: WriteNode<Idx = usize> + Default + Clone> FromIterator<W> for FlatDawg<N> {
     fn from_iter<T: IntoIterator<Item = W>>(iter: T) -> Self {
       let mut dawg = Self::default();
       dawg.extend(iter);
@@ -194,10 +247,12 @@ mod write {
   }
 }
 
-impl<N: WriteNode<Idx = usize>> FlatDawg<N> {
+impl<N: WriteNode<Idx = usize> + Clone + std::fmt::Debug + std::fmt::Display> FlatDawg<N> {
   /// Disconnects any nodes that don't have a marked end downstream.<br>
   /// Returns `self.empty()` on the resulting DAWG.
-  pub fn trim(&mut self) -> bool {
+  pub fn unlink(&mut self) -> bool {
+    debug_assert!(!self.0.is_empty());
+    debug_assert!(!self.is_cyclic(), "dawg is cyclic!\n{self}");
     let mut stack = vec![];
     self.on_backtrack(|_, node, _| {
       let mut empty = !node.is_end();
@@ -211,9 +266,9 @@ impl<N: WriteNode<Idx = usize>> FlatDawg<N> {
         empty &= c_empty;
       }
 
-      stack.push(empty)
+      stack.push(empty);
     });
-    !stack[0]
+    stack[0]
   }
 
   /// Minimises the size of the DAWG by reusing nodes whenever possible
@@ -221,39 +276,139 @@ impl<N: WriteNode<Idx = usize>> FlatDawg<N> {
   where
     N: Hash + Eq + Clone,
   {
+    debug_assert!(!self.0.is_empty());
+    debug_assert!(!self.is_cyclic(), "dawg is cyclic!\n{self}");
     // @note this could potentially be `HashMap<&N, usize>` to remove the
     // need to clone, but it lead to really wacky borrow checker issues
-    // around the interior `while let Some((c0, mut idx0))` loop.
+    // around the interior `for (c, mut idx0)` loop and the use of `entry`
     let mut seen: HashMap<N, usize> = HashMap::new();
-    self.on_backtrack(|idx, node, _| {
-      for (c, mut idx0) in node.clone().pairs() {
-        idx0 = *seen.entry(node.clone()).or_insert(idx0);
-        *node.get_mut(c) = idx0;
+    let mut stack = vec![(0, self.index(0).clone())];
+
+    while let Some(&mut (idx, ref mut node)) = stack.last_mut() {
+      if let Some((_, c_idx)) = node.pop() {
+        stack.push((c_idx, self.index(c_idx).clone()));
+        continue;
       }
-      seen.insert(node.clone(), idx);
-    })
+      stack.pop();
+
+      // backtracking, perform minimisation
+      for (c, c_idx) in self.index(idx).clone().pairs() {
+        if let Some(&n_idx) = seen.get(self.index(c_idx)) {
+          *(self.index_mut(idx).get_mut(c)) = n_idx;
+        }
+      }
+
+      if !seen.contains_key(self.index(idx)) {
+        seen.insert(self.index(idx).clone(), idx);
+      }
+    }
   }
 
-  /// Makes all nodes connected to the root contiguous.<br>
-  /// i.e. all children will appear besides each other.<br>
-  /// Removes any nodes not connected to the root.
-  pub fn make_contiguous(&mut self) {
-    let mut idx_max = 1;
-    let mut idx = 0;
+  /// Sorts the nodes of a DAWG in rough breadth first order<br>
+  /// and then removes any nodes not connected to the root node.
+  pub fn trim(&mut self) {
+    // Look, there's a fair few comments in here,<br>
+    // I've left headers to give the rough outline:
+    // 1. Generate breadth first order indices
+    // 2. Reorder nodes according to indices
+    // 3. Update indices to point to correct nodes
+    //
+    // The majority of the other comments are safety justifications,<br>
+    // these use some loose propositional logic to prove safety.
+    debug_assert!(!self.0.is_empty(), "dawg is empty");
+    debug_assert!(!self.is_cyclic(), "dawg is cyclic!\n{self}");
+    let mut idx_map = vec![0; self.0.len()];
+    let mut idxs = vec![Self::ROOT_IDX];
 
-    while idx < idx_max {
-      let node = self.index(idx);
-      let idxs: Vec<_> = node.iter().collect();
-      let n_idxs = idxs.len();
+    // # Generate a breadth first order
+    for i in 0.. {
+      let Some(&idx) = idxs.get(i) else { break };
 
-      for (i, j) in (idx_max..).zip(idxs) {
-        self.0.swap(i, j);
+      for c_idx in self.index(idx).iter() {
+        if idx_map[c_idx] > 0 {
+          continue;
+        }
+        idx_map[c_idx] = idxs.len();
+        idxs.push(c_idx);
       }
-      idx_max += n_idxs;
-      idx += 1;
+    }
+    // As idx_map items are set from idxs.len() and idxs.len()<br>
+    // changes every time it is set:
+    // 1. all 1..idxs.len() are present in idx_map
+    // 2. each 1..idxs.len() is only present once in idx_map
+
+    // # Reorder nodes and update links
+    //
+    // @note this could theoretically be done with only safe behaviour,
+    // by swapping the nodes and updating in place, however:
+    // 1. I've tried this a lot of times, with no success
+    // 2. I think this implementation may possibly be faster
+    let mut nodes = Vec::with_capacity(idxs.len());
+    let slot_ptr: *mut N = nodes.as_mut_ptr();
+
+    let mut pairs = idx_map.iter().zip(self.0.drain(..));
+    let (_, node) = pairs.next().unwrap(/* nodes is non-empty */);
+    unsafe {
+      // # Safety
+      //
+      // idxs is initialised to vec![Self::ROOT_IDX]
+      // & idxs length is never reduced (only `push` is called)
+      // -> 0 < idxs.len()
+      // -> 0 < slots.capacity()
+      // -> slots[0] is reserved
+      // -> slot_ptr is reserved
+      // -> slot_ptr is safe to write to
+      *slot_ptr = node
     }
 
-    self.0.truncate(idx)
+    for (&i, node) in pairs {
+      if i == 0 {
+        continue;
+      }
+
+      unsafe {
+        // # Safety
+        //
+        // (i > 0, _) in pairs
+        // -> i > 0 in idx_map
+        //   {by #1 after breadth first search}
+        // -> i in 1..idxs.len()
+        // -> i < idxs.len()
+        // -> i < slots.capacity()
+        // -> slots[i] is reserved
+        // -> slot_ptr.add(i) is reserved
+        // -> slot_ptr.add(i) is safe to write to
+        *slot_ptr.add(i) = node
+      }
+    }
+
+    unsafe {
+      // # Safety
+      //
+      //   {by for loop above}
+      // pairs.all(|(i, _)| i > 0 -> slots[i] has been initialised)
+      //   {by definition of pairs}
+      // -> idx_map.all(|i| i > 0 -> slots[i] has been initialised)
+      //   {by #2, all i in idx_map are < idxs.len()}
+      // -> idx_map.all(|i| i in 1..idxs.len() -> slot[i] has been initialised)
+      //   {by #1, all i in 1..idxs.len() are present in idx_map}
+      // -> (1..idxs.len()).all(|i| slots[i] has been initialised)
+      //   {by manually setting slots[0]}
+      // -> (0..idxs.len()).all(|i| slots[i] has been initialised)
+      //   {slice defintions}
+      // -> slots[0..idxs.len()] is initialised
+      //   {by safety in `set_len`, with old_len = 0}
+      // -> slots.set_len(idxs.len()) is safe
+      nodes.set_len(idxs.len())
+    }
+
+    // # Update indices
+    for node in nodes.iter_mut() {
+      for (k, c_idx) in node.clone().pairs() {
+        *node.get_mut(k) = idx_map[c_idx];
+      }
+    }
+    self.0 = nodes;
   }
 
   /// Makes the DAWG take up as little space as possible, by:
@@ -273,14 +428,14 @@ impl<N: WriteNode<Idx = usize>> FlatDawg<N> {
   where
     N: Default + Hash + Eq + Clone,
   {
-    if self.trim() {
-      // if we end up with an empty DAWG by trimming
+    if self.unlink() {
+      // if we end up with an empty DAWG by unlinking
       // we can short ciruit by setting to a Default
-      *self = Default::default();
+      *self = FlatDawg::default();
       return;
     }
     self.minimise();
-    self.make_contiguous();
+    self.trim();
   }
 }
 
@@ -290,15 +445,96 @@ impl From<FlatDawg<ThinNode>> for FlatDawg<WideNode<THIN_CHARS>> {
   }
 }
 
-impl From<FlatDawg<WideNode<THIN_CHARS>>> for FlatDawg<ThinNode> {
-  fn from(mut value: FlatDawg<WideNode<THIN_CHARS>>) -> Self {
-    value.make_contiguous();
-    FlatDawg(
-      value
-        .0
-        .into_iter()
-        .map(|node| node.try_into().expect("nodes should be contiguous"))
-        .collect(),
-    )
+// impl From<FlatDawg<WideNode<THIN_CHARS>>> for FlatDawg<ThinNode> {
+//   fn from(mut value: FlatDawg<WideNode<THIN_CHARS>>) -> Self {
+//     value.trim();
+//     FlatDawg(
+//       value
+//         .0
+//         .into_iter()
+//         .map(|node| node.try_into().expect("nodes should be contiguous"))
+//         .collect(),
+//     )
+//   }
+// }
+
+#[cfg(test)]
+mod test {
+  use super::FlatDawg;
+  use crate::{
+    utils::{from_word, into_word},
+    ReadDawg, WideNode, WriteDawg,
+  };
+  use prop::collection::vec;
+  use proptest::prelude::*;
+
+  fn dawg_word() -> BoxedStrategy<Vec<u8>> {
+    vec(0..26u8, 0..100).boxed()
+  }
+  fn dawg_words() -> BoxedStrategy<Vec<Vec<u8>>> {
+    vec(dawg_word(), 0..1_000).boxed()
+  }
+
+  proptest! {
+    #[test]
+    fn collect(words in dawg_words()) {
+      let _: FlatDawg<WideNode> = words.into_iter().collect();
+    }
+
+    #[test]
+    fn iter(words in dawg_words()) {
+      let dawg: FlatDawg<WideNode> = words.into_iter().collect();
+      let _: Vec<_> = dawg.words().collect();
+    }
+
+    #[test]
+    fn len(words in dawg_words()) {
+      let dawg: FlatDawg = words.clone().into_iter().collect();
+      let words_: Vec<_> = dawg.words().collect();
+
+      let strings: Vec<_> = words.into_iter().map(into_word).collect();
+      assert_eq!(dawg.len(), words_.len(), "all words = {strings:?}")
+    }
+
+    #[test]
+    fn collect_iter(words in dawg_words()) {
+      let dawg: FlatDawg = words.clone().into_iter().collect();
+
+      let mut i_words: Vec<_> = words.into_iter().map(into_word).collect();
+      let mut d_words: Vec<_> = dawg.words().map(into_word).collect();
+      i_words.sort();
+      i_words.dedup();
+      d_words.sort();
+      assert_eq!(i_words, d_words);
+    }
+
+    #[test]
+    fn minimise_len(words in dawg_words()) {
+      let mut dawg: FlatDawg = words.clone().into_iter().collect();
+      dawg.minimise();
+      dawg.trim();
+      debug_assert!(!dawg.is_cyclic(), "dawg is cyclic!\n{dawg}");
+
+      let mut i_words: Vec<_> = words.into_iter().map(into_word).collect();
+      let mut d_words: Vec<_> = dawg.words().map(into_word).collect();
+      i_words.sort();
+      i_words.dedup();
+      d_words.sort();
+      assert_eq!(i_words, d_words)
+    }
+  }
+
+  #[test]
+  fn minimise_deletes_duplicates() {
+    let mut dawg: FlatDawg = Default::default();
+    dawg.add(&from_word(&"cat"));
+    dawg.add(&from_word(&"cut"));
+
+    println!("{dawg}");
+    dawg.minimise();
+    println!("{dawg}");
+    dawg.trim();
+    println!("{dawg}");
+    assert_eq!(dawg.0.len(), 4);
   }
 }
