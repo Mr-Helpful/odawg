@@ -19,7 +19,7 @@ impl<'a, D: IndexDawg> Iterator for NodeIter<'a, D> {
   fn next(&mut self) -> Option<Self::Item> {
     let idx = self.idxs.pop()?;
     let node = self.dawg.index(idx);
-    self.idxs.extend((&node).iter());
+    self.idxs.extend(node.iter());
     Some(node)
   }
 }

@@ -37,19 +37,19 @@ pub trait ReadNode: Sized {
   }
 
   /// An iterator over keys used to access children
-  fn keys(self) -> KeyIter<Self> {
+  fn keys(&self) -> KeyIter<&Self> {
     KeyIter::new(self)
   }
 
   /// An iterator over the child indices
-  fn iter(self) -> ChildIter<Self> {
+  fn iter(&self) -> ChildIter<&Self> {
     ChildIter::new(self)
   }
 
   /// An iterator over `(c, idx)` where:<br>
   /// - `c: u8` the child value
   /// - `idx: usize` the child's index
-  fn pairs(self) -> PairIter<Self> {
+  fn pairs(&self) -> PairIter<&Self> {
     PairIter::new(self)
   }
 }
