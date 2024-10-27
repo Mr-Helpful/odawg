@@ -7,21 +7,9 @@ use std::{array, fmt::Display};
 /// that are potentially non-contiguous.
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WideNode<const N: usize = THIN_CHARS> {
-  #[serde(default, skip_serializing_if = "end_skip")]
   pub(crate) end: bool,
-  #[serde(default = "children_default", skip_serializing_if = "children_skip")]
   #[serde(with = "serde_array")]
   pub(crate) children: [usize; N],
-}
-
-fn end_skip(end: &bool) -> bool {
-  *end
-}
-fn children_skip<const N: usize>(children: &[usize; N]) -> bool {
-  children == &[0; N]
-}
-fn children_default<const N: usize>() -> [usize; N] {
-  [0; N]
 }
 
 impl<const N: usize> Default for WideNode<N> {

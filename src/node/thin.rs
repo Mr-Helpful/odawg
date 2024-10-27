@@ -12,20 +12,8 @@ const END_MASK: u32 = 1 << THIN_CHARS;
 // @note leaf nodes serialize to be empty
 #[derive(Clone, Copy, Debug, Default, Hash, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ThinNode {
-  #[serde(default, skip_serializing_if = "idx_skip")]
   pub(crate) idx: usize,
-  #[serde(default = "mask_default", skip_serializing_if = "mask_skip")]
   pub(crate) mask: u32,
-}
-
-fn idx_skip(idx: &usize) -> bool {
-  idx == &0
-}
-fn mask_default() -> u32 {
-  END_MASK
-}
-fn mask_skip(mask: &u32) -> bool {
-  mask == &END_MASK
 }
 
 impl ReadNode for ThinNode {
