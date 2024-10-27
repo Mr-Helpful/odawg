@@ -42,6 +42,6 @@ pub trait WriteDawg: IndexMutDawg {
 
   /// Intersects another DAWG with `self`, only keeping words in both DAWGs.
   fn intersect<D: ReadDawg>(&mut self, dawg: &D) {
-    self.keep(|word| dawg.has(word))
+    self.keep(|word| dawg.has(word));
   }
 }

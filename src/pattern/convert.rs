@@ -13,7 +13,7 @@ impl From<Pattern> for FlatDawg<ThinNode> {
         mask,
       };
       for _ in 0..repeats {
-        nodes.push(node)
+        nodes.push(node);
       }
       repeats = mask.count_ones() as usize;
     }
@@ -23,7 +23,7 @@ impl From<Pattern> for FlatDawg<ThinNode> {
       mask: 1 << THIN_CHARS,
     };
     for _ in 0..repeats {
-      nodes.push(end_node)
+      nodes.push(end_node);
     }
 
     Self(nodes)

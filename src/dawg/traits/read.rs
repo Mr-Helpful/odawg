@@ -11,7 +11,7 @@ pub trait ReadDawg: Sized + IndexDawg {
 
   /// How many words are stored in the dag
   fn len(&self) -> usize {
-    NodeIter::from(self).filter(|node| node.is_end()).count()
+    NodeIter::from(self).filter(ReadNode::is_end).count()
   }
 
   /// Whether this DAWG contains a given word
@@ -22,7 +22,7 @@ pub trait ReadDawg: Sized + IndexDawg {
       if !node.has(c) {
         return false;
       }
-      idx = node.get(c)
+      idx = node.get(c);
     }
     self.index(idx).is_end()
   }

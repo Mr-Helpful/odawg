@@ -8,11 +8,11 @@ impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for AndNode<NUM, N> {
   type Idx = [usize; NUM];
 
   fn is_empty(&self) -> bool {
-    self.0.iter().all(|node| node.is_empty())
+    self.0.iter().all(ReadNode::is_empty)
   }
 
   fn is_end(&self) -> bool {
-    self.0.iter().all(|node| node.is_end())
+    self.0.iter().all(ReadNode::is_end)
   }
 
   fn has(&self, c: u8) -> bool {

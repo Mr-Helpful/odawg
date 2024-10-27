@@ -9,18 +9,17 @@ pub use end_sort::EndSort;
 pub fn from_alpha(c: char) -> u8 {
   debug_assert!(
     c.is_ascii_lowercase(),
-    "Character '{}' out of supported range",
-    c
+    "Character '{c}' out of supported range",
   );
   c as u8 - b'a'
 }
 
-pub fn from_word(s: String) -> Vec<u8> {
-  s.chars().map(from_alpha).collect()
+pub fn from_word(s: &impl AsRef<str>) -> Vec<u8> {
+  s.as_ref().chars().map(from_alpha).collect()
 }
 
 pub fn into_alpha(v: u8) -> char {
-  debug_assert!((0..26).contains(&v), "Value '{}' out of supported range", v);
+  debug_assert!((0..26).contains(&v), "Value {v} out of supported range");
   (v + b'a') as char
 }
 

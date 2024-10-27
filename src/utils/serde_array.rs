@@ -27,7 +27,7 @@ struct ArrayVisitor<const N: usize, T>(PhantomData<T>);
 impl<'de, const N: usize, T: Deserialize<'de>> Visitor<'de> for ArrayVisitor<N, T> {
   type Value = [T; N];
   fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(formatter, "[T; {}]", N)
+    write!(formatter, "[T; {N}]")
   }
 
   fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>

@@ -1,12 +1,12 @@
-use super::{ReadNode, ThinNode, WriteNode};
-use crate::utils::serde_array;
+use super::{ReadNode, ThinNode, WriteNode, THIN_CHARS};
+use crate::utils::{into_alpha, serde_array};
 use serde::{Deserialize, Serialize};
-use std::array;
+use std::{array, fmt::Display};
 
 /// A full width node, capable of representing children<br>
 /// that are potentially non-contiguous.
 #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, Serialize, Deserialize)]
-pub struct WideNode<const N: usize> {
+pub struct WideNode<const N: usize = THIN_CHARS> {
   #[serde(default, skip_serializing_if = "end_skip")]
   pub(crate) end: bool,
   #[serde(default = "children_default", skip_serializing_if = "children_skip")]

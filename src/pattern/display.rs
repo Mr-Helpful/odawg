@@ -21,7 +21,12 @@ impl Pattern {
       return f.write_str("[]");
     }
     if mask.count_ones() == 1 {
-      return f.write_char(into_alpha(mask.trailing_zeros() as u8));
+      return f.write_char(into_alpha(
+        mask
+          .trailing_zeros()
+          .try_into()
+          .expect("no more than 255 `0`s in a u32"),
+      ));
     }
     if mask.count_ones() == 26 {
       return f.write_char('-');
@@ -30,9 +35,15 @@ impl Pattern {
     f.write_char('[')?;
     let mut i = 0;
     while mask.count_ones() > 0 {
-      let s = mask.trailing_zeros() as u8;
+      let s: u8 = mask
+        .trailing_zeros()
+        .try_into()
+        .expect("no more than 255 `0`s in a u32");
       mask >>= s;
-      let l = mask.trailing_ones() as u8;
+      let l: u8 = mask
+        .trailing_ones()
+        .try_into()
+        .expect("no more than 255 `1`s in a u32");
       mask >>= l;
 
       i += s;

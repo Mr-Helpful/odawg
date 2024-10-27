@@ -38,8 +38,8 @@ where
 
   fn size_hint(&self) -> (usize, Option<usize>) {
     let (x, y) = &self.next_tup;
-    let ex = if x.is_some() { 1 } else { 0 };
-    let ey = if y.is_some() { 1 } else { 0 };
+    let ex = usize::from(x.is_some());
+    let ey = usize::from(y.is_some());
     let extra = ex + ey;
 
     let (ix, iy) = &self.iters;

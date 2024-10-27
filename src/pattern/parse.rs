@@ -43,7 +43,7 @@ impl Debug for ErrorKind {
       Self::UnclosedRange => "Range was not closed with a character",
       Self::Unexpected => "Unexpected character in Pattern",
     };
-    write!(f, "{}", message)
+    write!(f, "{message}")
   }
 }
 
@@ -67,12 +67,12 @@ impl Pattern {
           let v = from_alpha(c);
           let s = start.replace(v).unwrap_or(0);
           mask |= Self::range_mask(s, v);
-          is_range = false
+          is_range = false;
         }
         'a'..='z' => {
           let v = from_alpha(c);
           if let Some(v) = start.replace(v) {
-            mask |= Self::range_mask(v, v)
+            mask |= Self::range_mask(v, v);
           }
         }
         '-' if !is_range => is_range = true,
@@ -80,9 +80,9 @@ impl Pattern {
         // end of group, cleanup previous char/range
         ']' => {
           if is_range {
-            mask |= Self::range_mask(start.unwrap_or(0), 25)
+            mask |= Self::range_mask(start.unwrap_or(0), 25);
           } else if let Some(v) = start {
-            mask |= Self::range_mask(v, v)
+            mask |= Self::range_mask(v, v);
           }
           return Ok(mask);
         }
@@ -131,7 +131,7 @@ impl FromStr for Pattern {
       match c {
         'a'..='z' => {
           let v = from_alpha(c);
-          masks.push(Self::range_mask(v, v))
+          masks.push(Self::range_mask(v, v));
         }
         '-' => masks.push(Self::range_mask(0, 25)),
         '[' => masks.push(Self::parse_group(s, &mut chars)?),

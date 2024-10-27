@@ -23,7 +23,10 @@ impl<'a> WordIter<'a> {
     if mask == &0 {
       return None;
     }
-    let c = mask.trailing_zeros() as u8;
+    let c: u8 = mask
+      .trailing_zeros()
+      .try_into()
+      .expect("no more than 255 `0`s in a u32");
     *mask &= !(1 << c);
     Some(c)
   }
@@ -31,7 +34,7 @@ impl<'a> WordIter<'a> {
   /// Fills the word to the length of the pattern, using the pattern masks
   fn rebuild_word(&mut self) -> Option<Vec<u8>> {
     let Self { pat, word, masks } = self;
-    for mut mask in pat.0[word.len()..pat.0.len()].iter().cloned() {
+    for mut mask in pat.0[word.len()..pat.0.len()].iter().copied() {
       word.push(Self::next_c(&mut mask)?);
       masks.push(mask);
     }

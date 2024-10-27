@@ -11,14 +11,14 @@ impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for OrNode<NUM, N> {
     self
       .0
       .iter()
-      .any(|node| node.as_ref().is_some_and(|node| node.is_empty()))
+      .any(|node| node.as_ref().is_some_and(ReadNode::is_empty))
   }
 
   fn is_end(&self) -> bool {
     self
       .0
       .iter()
-      .any(|node| node.as_ref().is_some_and(|node| node.is_end()))
+      .any(|node| node.as_ref().is_some_and(ReadNode::is_end))
   }
 
   fn has(&self, c: u8) -> bool {

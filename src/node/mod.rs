@@ -96,6 +96,16 @@ pub trait WriteNode: ReadNode {
   /// Sets the index of a given child `c`.<br>
   /// Returns the previous index of the child.
   fn get_mut(&mut self, c: u8) -> &mut Self::Idx;
+
+  /// Pops the next child pair from this node
+  fn pop(&mut self) -> Option<(u8, Self::Idx)>
+  where
+    Self::Idx: Default,
+  {
+    let c = self.next_c(0)?;
+    let idx = std::mem::take(self.get_mut(c));
+    Some((c, idx))
+  }
 }
 
 impl<N: WriteNode> WriteNode for &mut N {
