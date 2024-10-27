@@ -33,6 +33,17 @@ impl<const N: usize> Default for WideNode<N> {
   }
 }
 
+impl<const N: usize> Display for WideNode<N> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let end_str = if self.is_end() { "end]" } else { "   ]" };
+    write!(f, "{end_str}")?;
+    for c in self.keys() {
+      write!(f, " {}: {}", into_alpha(c), self.get(c))?;
+    }
+    Ok(())
+  }
+}
+
 impl<const N: usize> ReadNode for WideNode<N> {
   type Idx = usize;
 
