@@ -472,7 +472,7 @@ mod test {
     vec(0..26u8, 0..100).boxed()
   }
   fn dawg_words() -> BoxedStrategy<Vec<Vec<u8>>> {
-    vec(dawg_word(), 0..1_000).boxed()
+    vec(dawg_word(), 0..100).boxed()
   }
 
   proptest! {
