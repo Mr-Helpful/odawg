@@ -462,7 +462,7 @@ impl From<FlatDawg<ThinNode>> for FlatDawg<WideNode<THIN_CHARS>> {
 mod test {
   use super::FlatDawg;
   use crate::{
-    utils::{from_word, into_word},
+    utils::convert::{from_word, into_word},
     ReadDawg, WideNode, WriteDawg,
   };
   use prop::collection::vec;

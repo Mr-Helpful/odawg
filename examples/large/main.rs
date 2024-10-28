@@ -1,4 +1,4 @@
-use odawg::{utils::from_word, FlatDawg, ReadDawg, WideNode};
+use odawg::{utils::convert::from_word, FlatDawg, ReadDawg, WideNode};
 use std::{fs, path::Path};
 
 fn main() {

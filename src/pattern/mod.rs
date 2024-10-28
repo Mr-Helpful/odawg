@@ -1,4 +1,4 @@
-use crate::utils::from_alpha;
+use crate::utils::convert::from_alpha;
 use serde::{Deserialize, Serialize};
 
 /// A word-like pattern, defined by the acceptable letters at each index.

@@ -1,4 +1,4 @@
-use crate::utils::from_alpha;
+use crate::utils::convert::from_alpha;
 
 pub trait IntoLetters {
   type LetterIter: Iterator<Item = u8>;

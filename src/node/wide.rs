@@ -1,5 +1,5 @@
 use super::{ReadNode, ThinNode, WriteNode, THIN_CHARS};
-use crate::utils::{into_alpha, serde_array};
+use crate::utils::{convert::into_alpha, serde_array};
 use serde::{Deserialize, Serialize};
 use std::{array, fmt::Display};
 

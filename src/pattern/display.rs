@@ -1,5 +1,5 @@
 use super::Pattern;
-use crate::utils::into_alpha;
+use crate::utils::convert::into_alpha;
 use std::fmt::{Display, Write};
 
 impl Pattern {

@@ -1,5 +1,5 @@
 use super::Pattern;
-use crate::utils::from_alpha;
+use crate::utils::convert::from_alpha;
 use std::{fmt::Debug, str::FromStr};
 
 pub struct ParseError {

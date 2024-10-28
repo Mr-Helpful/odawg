@@ -76,7 +76,7 @@ impl<'a> Iterator for WordIter<'a> {
 #[cfg(test)]
 mod test {
   use super::{super::strategies::pattern_len, Pattern};
-  use crate::utils::into_word;
+  use crate::utils::convert::into_word;
   use proptest::prelude::*;
 
   proptest! {
