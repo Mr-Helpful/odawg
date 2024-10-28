@@ -20,7 +20,7 @@ impl ReadNode for ThinNode {
   type Idx = usize;
 
   fn is_empty(&self) -> bool {
-    (self.mask & CHILD_MASK) > 0
+    (self.mask & CHILD_MASK) == 0
   }
 
   fn is_end(&self) -> bool {
