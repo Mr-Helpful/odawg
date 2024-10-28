@@ -60,9 +60,12 @@ mod test {
     #[test]
     fn any_pattern(pat in pattern_len(100_000)) {
       let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-      let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+      let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
       for word in pat.words() {
+        assert!(thin_dawg.has(&word));
+        assert!(wide_dawg.has(&word));
+      }
 
       for word in thin_dawg.words() {
         assert!(pat.has(&word));
@@ -74,7 +77,7 @@ mod test {
   fn empty() {
     let pat: Pattern = "".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     assert!(!thin_dawg.has("jab"));
     assert!(!wide_dawg.has("jab"));
@@ -84,11 +87,11 @@ mod test {
   fn word() {
     let pat: Pattern = "jab".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
-      assert!(thin_dawg.has(&word[..]));
-      assert!(wide_dawg.has(&word[..]));
+      assert!(thin_dawg.has(&word));
+      assert!(wide_dawg.has(&word));
     }
   }
 
@@ -96,7 +99,7 @@ mod test {
   fn any() {
     let pat: Pattern = "-ab".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(word.as_slice()));
@@ -108,7 +111,7 @@ mod test {
   fn group() {
     let pat: Pattern = "[fjt]ab".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -120,7 +123,7 @@ mod test {
   fn range() {
     let pat: Pattern = "[r-t]at".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -132,7 +135,7 @@ mod test {
   fn multi() {
     let pat: Pattern = "[b-cr-t]at".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -144,7 +147,7 @@ mod test {
   fn mixed() {
     let pat: Pattern = "[b-cpr-t]at".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -156,7 +159,7 @@ mod test {
   fn many() {
     let pat: Pattern = "[r-t][ai]t".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -168,7 +171,7 @@ mod test {
   fn start() {
     let pat: Pattern = "[-b]ye".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -180,7 +183,7 @@ mod test {
   fn end() {
     let pat: Pattern = "[y-]ap".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
@@ -192,7 +195,7 @@ mod test {
   fn all() {
     let pat: Pattern = "[-cmr-ty-]ap".parse().unwrap();
     let thin_dawg: FlatDawg<ThinNode> = pat.clone().into();
-    let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
+    let wide_dawg: FlatDawg<WideNode> = pat.clone().into();
 
     for word in pat.words() {
       assert!(thin_dawg.has(&word[..]));
