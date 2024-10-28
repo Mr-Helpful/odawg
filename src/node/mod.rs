@@ -14,7 +14,9 @@ pub trait ReadNode: Sized {
   type Idx;
 
   /// Whether `self` has no children
-  fn is_empty(&self) -> bool;
+  fn is_empty(&self) -> bool {
+    self.keys().next().is_none()
+  }
 
   /// Whether `self` represents the end of a word
   fn is_end(&self) -> bool;
