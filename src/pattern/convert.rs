@@ -63,8 +63,9 @@ mod test {
       let wide_dawg: FlatDawg<WideNode<26>> = pat.clone().into();
 
       for word in pat.words() {
-        assert!(thin_dawg.has(&word[..]));
-        assert!(wide_dawg.has(&word[..]));
+
+      for word in thin_dawg.words() {
+        assert!(pat.has(&word));
       }
     }
   }
