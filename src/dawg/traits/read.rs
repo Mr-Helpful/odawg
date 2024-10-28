@@ -1,4 +1,5 @@
-use super::{IndexDawg, IntoLetters, NodeIter, ReadNode, WordIter};
+use super::{IndexDawg, NodeIter, ReadNode, WordIter};
+use crate::utils::convert::IntoLetters;
 
 /// Methods for reading words from a DAWG
 ///
