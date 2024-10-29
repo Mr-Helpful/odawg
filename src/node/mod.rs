@@ -1,11 +1,11 @@
-mod and;
-pub use and::AndNode;
+mod all;
+pub use all::AllNode;
 mod thin;
 pub use thin::{ThinNode, THIN_CHARS};
 mod wide;
 pub use wide::WideNode;
-mod or;
-pub use or::OrNode;
+mod any;
+pub use any::AnyNode;
 mod iters;
 use iters::{ChildIter, KeyIter, PairIter};
 

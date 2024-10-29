@@ -1,10 +1,10 @@
 use super::{ReadNode, ThinNode, WideNode, WriteNode, THIN_CHARS};
 
-mod and;
-pub use and::AndDawg;
+mod all;
+pub use all::AllDawg;
 mod flat;
 pub use flat::FlatDawg;
-mod or;
+mod any;
 
 mod iters;
 pub use iters::{NodeIter, WordIter};

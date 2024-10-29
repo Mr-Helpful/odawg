@@ -2,9 +2,9 @@ use super::ReadNode;
 use std::array;
 
 #[derive(Clone, Copy)]
-pub struct OrNode<const NUM: usize, N>(pub(crate) [Option<N>; NUM]);
+pub struct AnyNode<const NUM: usize, N>(pub(crate) [Option<N>; NUM]);
 
-impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for OrNode<NUM, N> {
+impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for AnyNode<NUM, N> {
   type Idx = [Option<usize>; NUM];
 
   fn is_empty(&self) -> bool {

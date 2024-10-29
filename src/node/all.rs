@@ -2,9 +2,9 @@ use super::ReadNode;
 use std::array;
 
 #[derive(Clone, Copy)]
-pub struct AndNode<const NUM: usize, N>(pub(crate) [N; NUM]);
+pub struct AllNode<const NUM: usize, N>(pub(crate) [N; NUM]);
 
-impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for AndNode<NUM, N> {
+impl<const NUM: usize, N: ReadNode<Idx = usize>> ReadNode for AllNode<NUM, N> {
   type Idx = [usize; NUM];
 
   fn is_empty(&self) -> bool {
