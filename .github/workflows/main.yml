@@ -116,7 +116,7 @@ jobs:
         run: cargo doc
 
       - name: Update README
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "docs: syncs README file"
           file_pattern: "./README.md"
