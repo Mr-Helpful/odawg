@@ -1,5 +1,10 @@
-// pub mod rcdawg;
-// pub use rcdawg::*;
+#![warn(
+  clippy::correctness,
+  clippy::suspicious,
+  clippy::complexity,
+  clippy::perf,
+  clippy::style
+)]
 mod pattern;
 pub mod utils;
 pub use utils::{serde_array, EndSort};
