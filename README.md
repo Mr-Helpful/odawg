@@ -1,7 +1,7 @@
 # ODAWG data structure
 
 A common issue when playing scrabble is finding playable words in a given row / column.
-The rough approach I've used to come up with is detailed below.
+The rough approach I've used is detailed below.
 
 ## Tries: eliminating common prefixes
 
