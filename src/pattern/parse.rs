@@ -160,6 +160,8 @@ impl FromStr for Pattern {
 
 #[cfg(test)]
 mod test {
+  use crate::ReadDawg;
+
   use super::{super::strategies::pattern, Pattern};
   use proptest::prelude::*;
 
