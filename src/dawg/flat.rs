@@ -530,11 +530,8 @@ mod test {
     dawg.add(&from_word(&"cat"));
     dawg.add(&from_word(&"cut"));
 
-    println!("{dawg}");
     dawg.minimise();
-    println!("{dawg}");
     dawg.trim();
-    println!("{dawg}");
     assert_eq!(dawg.0.len(), 4);
   }
 }
