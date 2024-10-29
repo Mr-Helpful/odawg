@@ -1,7 +1,9 @@
+<!-- cargo-sync-readme start -->
+
 # ODAWG data structure
 
-A common issue when playing scrabble is finding playable words in a given row / column.
-The rough approach I've used is detailed below.
+A common issue when playing scrabble is finding playable words in
+a given row / column. I've attempted to solve this using the method below.
 
 ## Tries: eliminating common prefixes
 
@@ -63,3 +65,5 @@ __DAWG Structure__:
              │
              └─ b.
 ```
+
+<!-- cargo-sync-readme end -->
