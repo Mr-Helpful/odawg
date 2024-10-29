@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 942edcd25ca6de155c0c8486c5aafc1eb70e30fcc3cd63b327e5df5beed6b3d9 # shrinks to pat = Pattern([32768])
