@@ -1,4 +1,4 @@
-name: Main
+name: ODAWG CI Pipeline
 
 on:
   workflow_dispatch:
@@ -23,9 +23,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Build
-        uses: ./.github/actions/build
 
+      - name: Build
+        run: |
+          cargo build --verbose
+          cargo build --release --verbose
+
+      - id: cache
+        name: Cache Build
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: Build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
+
+  # Lints package using `cargo clippy`
   lint:
     runs-on: ubuntu-latest
     needs: build
@@ -74,3 +90,39 @@ jobs:
         with:
           name: Coverage Report
           path: ./tarpaulin-report.html
+
+  # Builds Documentation and syncs README.md
+  docs:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        uses: ./.github/actions/build
+
+      - name: Install `cargo sync-readme`
+        uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: cargo-sync-readme
+
+      - name: Sync Readme
+        run: cargo sync-readme
+
+      - name: Generate docs
+        run: cargo doc
+
+      - name: Update README
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "docs: syncs README file"
+          file_pattern: "./README.md"
+
+      - name: Upload docs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Documentation
+          path: ./target/doc

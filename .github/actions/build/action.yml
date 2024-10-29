@@ -1,13 +1,13 @@
 name: ODAWG
-description: Builds the source code for the ODAWG library
+description: Fetches the built source code for the ODAWG library
 author: Mr-Helpful
 
 runs:
   using: composite
   steps:
     - id: cache
-      name: Cache Build
-      uses: actions/cache@v4
+      name: Restore Build
+      uses: actions/cache/restore@v4
       with:
         path: |
           ~/.cargo/bin/
@@ -16,10 +16,3 @@ runs:
           ~/.cargo/git/db/
           target/
         key: Build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
-
-    - name: Build
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        cargo build --verbose
-        cargo build --release --verbose
-      shell: bash
