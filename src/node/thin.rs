@@ -19,6 +19,10 @@ pub struct ThinNode {
 impl ReadNode for ThinNode {
   type Idx = usize;
 
+  fn len(&self) -> usize {
+    (self.mask & CHILD_MASK).count_ones() as usize
+  }
+
   fn is_empty(&self) -> bool {
     (self.mask & CHILD_MASK) == 0
   }

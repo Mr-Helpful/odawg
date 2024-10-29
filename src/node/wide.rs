@@ -35,6 +35,10 @@ impl<const N: usize> Display for WideNode<N> {
 impl<const N: usize> ReadNode for WideNode<N> {
   type Idx = usize;
 
+  fn len(&self) -> usize {
+    self.children.iter().map(|&idx| usize::from(idx > 0)).sum()
+  }
+
   fn is_empty(&self) -> bool {
     self.children == [0; N]
   }

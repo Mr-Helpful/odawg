@@ -13,6 +13,11 @@ use iters::{ChildIter, KeyIter, PairIter};
 pub trait ReadNode: Sized {
   type Idx;
 
+  /// How many children `self` has
+  fn len(&self) -> usize {
+    self.keys().count()
+  }
+
   /// Whether `self` has no children
   fn is_empty(&self) -> bool {
     self.keys().next().is_none()
