@@ -1,4 +1,4 @@
-name: ODAWG CI Pipeline
+name: Package
 
 on:
   workflow_dispatch:
