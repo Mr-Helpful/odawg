@@ -2,6 +2,15 @@
 name = "odawg"
 version = "0.1.0"
 edition = "2021"
+authors = ["alexanderdcolby@proton.me"]
+description = "Directed Acyclic Graphs for storing words"
+readme = "README.md"
+license = "MIT"
+homepage = "https://github.com/Mr-Helpful/odawg"
+repository = "https://github.com/Mr-Helpful/odawg"
+keywords = ["text", "search", "string", "encoding"]
+categories = ["algorithms", "data-structures", "text-processing"]
+exclude = ["/.github", "/examples", "/proptest-regressions"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
