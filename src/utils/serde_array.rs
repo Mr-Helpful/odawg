@@ -1,3 +1,9 @@
+//! # Serialize and Deserialize for arrays
+//!
+//! Currently, the `serde` package doesn't support constant size arrays,<br>
+//! of the form `[T; N]` where `T` is serializable and deserializable.<br>
+//! As we need to be able to serialize arrays to be able to serialize nodes.
+
 use serde::{
   de::{Error, SeqAccess, Visitor},
   ser::SerializeTuple,
@@ -5,6 +11,7 @@ use serde::{
 };
 use std::marker::PhantomData;
 
+/// A custom serializer for arrays of serializable values
 pub fn serialize<const N: usize, T: Serialize, S: Serializer>(
   children: &[T; N],
   serializer: S,
@@ -16,6 +23,7 @@ pub fn serialize<const N: usize, T: Serialize, S: Serializer>(
   state.end()
 }
 
+/// A custom deserializer for arrays of deserializable values
 pub fn deserialize<'de, const N: usize, T: Deserialize<'de>, D: Deserializer<'de>>(
   deserializer: D,
 ) -> Result<[T; N], D::Error> {

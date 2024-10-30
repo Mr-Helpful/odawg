@@ -4,28 +4,32 @@ pub const ALPHA_START: u8 = b'a';
 pub const ALPHA_CHARS: u8 = 26;
 const ALPHA_RANGE: Range<u8> = ALPHA_START..(ALPHA_START + ALPHA_CHARS);
 
+/// Translates from an lowercase alphabetic character to a `u8` letter
 pub fn from_alpha(c: char) -> u8 {
   debug_assert!(
     ALPHA_RANGE.contains(&(c as u8)),
-    "Character '{c}' out of supported range",
+    "Character '{c}' out the alphabetic range \"a-z\"",
   );
   c as u8 - ALPHA_START
 }
 
-pub fn from_word(s: &impl AsRef<str>) -> Vec<u8> {
+/// Translates from a word comprised of alphabetic characters to `u8` letters
+pub fn from_word(s: impl AsRef<str>) -> Vec<u8> {
   s.as_ref().chars().map(from_alpha).collect()
 }
 
+/// Translates from a `u8` letter to a alphabetic character
 pub fn into_alpha(v: u8) -> char {
   debug_assert!(
     (0..ALPHA_CHARS).contains(&v),
-    "Value {v} out of supported range"
+    "Value {v} out of supported range 0-25"
   );
   (v + ALPHA_START) as char
 }
 
-pub fn into_word(v: Vec<u8>) -> String {
-  v.into_iter().map(into_alpha).collect()
+/// Translates from a `u8` slice to an alphabetic word
+pub fn into_word(v: impl AsRef<[u8]>) -> String {
+  v.as_ref().iter().copied().map(into_alpha).collect()
 }
 
 /// A type that can be represented as a

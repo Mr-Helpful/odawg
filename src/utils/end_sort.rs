@@ -2,6 +2,7 @@ use super::MergeIter;
 
 /// Trait for collections that support sorting the end into the collection.
 pub trait EndSort<T> {
+  /// Sorts all items in `self[from..]` into `self[..from]`
   fn sort_end(&mut self, from: usize)
   where
     T: Ord;
@@ -61,7 +62,7 @@ impl<T> EndSort<T> for Vec<T> {
 }
 
 #[cfg(test)]
-pub(crate) mod test {
+mod test {
   use crate::utils::{EndSort, IsSorted};
   use proptest::prelude::*;
 
