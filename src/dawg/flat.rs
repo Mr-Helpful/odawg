@@ -140,7 +140,7 @@ mod write {
   }
 
   impl<N: WriteNode<Idx = usize> + Default + Clone> WriteDawg for FlatDawg<N> {
-    fn add(&mut self, word: &impl AsRef<[u8]>) -> bool {
+    fn add(&mut self, word: impl AsRef<[u8]>) -> bool {
       let word = word.as_ref();
 
       let mut idx = 0;
@@ -173,7 +173,7 @@ mod write {
       }
     }
 
-    fn sub(&mut self, word: &impl AsRef<[u8]>) -> bool {
+    fn sub(&mut self, word: impl AsRef<[u8]>) -> bool {
       let word = word.as_ref();
 
       let mut idx = 0;
@@ -527,8 +527,8 @@ mod test {
   #[test]
   fn minimise_deletes_duplicates() {
     let mut dawg: FlatDawg = Default::default();
-    dawg.add(&from_word(&"cat"));
-    dawg.add(&from_word(&"cut"));
+    dawg.add(from_word("cat"));
+    dawg.add(from_word("cut"));
 
     dawg.minimise();
     dawg.trim();

@@ -8,7 +8,7 @@ use super::{IndexMutDawg, ReadDawg};
 /// are all pretty inefficient: override them if at all possible.
 pub trait WriteDawg: IndexMutDawg {
   /// Adds a single word the DAWG, returning whether it existed
-  fn add(&mut self, word: &impl AsRef<[u8]>) -> bool;
+  fn add(&mut self, word: impl AsRef<[u8]>) -> bool;
 
   /// Adds multiple words to the DAWG
   fn add_all<W: AsRef<[u8]>>(&mut self, words: impl IntoIterator<Item = W>) {
@@ -23,7 +23,7 @@ pub trait WriteDawg: IndexMutDawg {
   }
 
   /// Removes a single word from the DAWG, returning whether it existed
-  fn sub(&mut self, word: &impl AsRef<[u8]>) -> bool;
+  fn sub(&mut self, word: impl AsRef<[u8]>) -> bool;
 
   /// Removes multiple words from the DAWG
   fn sub_all<W: AsRef<[u8]>>(&mut self, words: impl IntoIterator<Item = W>) {

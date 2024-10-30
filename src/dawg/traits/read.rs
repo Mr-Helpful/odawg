@@ -28,6 +28,7 @@ pub trait ReadDawg: Sized + IndexDawg {
     self.index(idx).is_end()
   }
 
+  /// All the words contained in a given DAWG
   fn words(&self) -> impl Iterator<Item = Vec<u8>> {
     WordIter::from(self)
   }

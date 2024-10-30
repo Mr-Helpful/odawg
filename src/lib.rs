@@ -64,6 +64,7 @@
 //!              └─ b.
 //! ```
 #![warn(
+  missing_docs,
   clippy::correctness,
   clippy::suspicious,
   clippy::complexity,
@@ -71,8 +72,8 @@
   clippy::style
 )]
 mod pattern;
-pub mod utils;
-pub use utils::{serde_array, EndSort};
+mod utils;
+pub use utils::{from_word, into_word, serde_array, EndSort};
 mod dawg;
 pub use dawg::{AllDawg, FlatDawg, ReadDawg, WriteDawg};
 mod node;
