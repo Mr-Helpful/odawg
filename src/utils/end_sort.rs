@@ -35,7 +35,7 @@ impl<T> EndSort<T> for Vec<T> {
   /// currently possible, but I can't work it out either.
   ///
   /// ```
-  /// # use odawg::utils::EndSort;
+  /// # use odawg::EndSort;
   /// //                       sorted | unsorted
   /// let values = vec![1, 2, 4, 7, 8 , 5, 3, 6];
   ///
