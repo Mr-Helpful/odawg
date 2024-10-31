@@ -1,3 +1,5 @@
+//! [![Package](https://github.com/Mr-Helpful/odawg/actions/workflows/main.yml/badge.svg)](https://github.com/Mr-Helpful/odawg/actions/workflows/main.yml)
+//!
 //! # ODAWG data structure
 //!
 //! A common issue when playing scrabble is finding playable words in
