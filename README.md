@@ -1,8 +1,8 @@
-<!-- cargo-sync-readme start -->
-
-[Package](https://github.com/Mr-Helpful/odawg/actions/workflows/main.yml)
-
 # ODAWG data structure
+
+[![Package](https://github.com/Mr-Helpful/odawg/actions/workflows/main.yml/badge.svg)](https://github.com/Mr-Helpful/odawg/actions/workflows/main.yml)
+
+<!-- cargo-sync-readme start -->
 
 A common issue when playing scrabble is finding playable words in
 a given row / column. I've attempted to solve this using the method below.
