@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 /// The number of character that thin Dawg nodes support.<br>
 /// Can be up to 31 characters at most, due to implementation constraints.
 pub const THIN_CHARS: usize = 26;
-const CHILD_MASK: u32 = (1 << THIN_CHARS) - 1;
-const END_MASK: u32 = 1 << THIN_CHARS;
+pub(crate) const CHILD_MASK: u32 = (1 << THIN_CHARS) - 1;
+pub(crate) const END_MASK: u32 = 1 << THIN_CHARS;
 
 /// Memory efficient Dawg nodes.<br>
 /// Relies on the assumption that all children are contiguous.
@@ -76,5 +76,90 @@ impl TryFrom<WideNode<26>> for ThinNode {
     }
 
     Ok(Self { idx, mask })
+  }
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+  use super::{ReadNode, ThinNode, CHILD_MASK};
+  use proptest::{bits::u32::sampled, prelude::*};
+  use std::collections::HashSet;
+
+  pub fn thin_mask(mask: u32) -> ThinNode {
+    ThinNode { idx: 0, mask }
+  }
+
+  pub fn thin_node() -> BoxedStrategy<ThinNode> {
+    any::<(u32, usize)>()
+      .prop_map(|(mask, idx)| ThinNode {
+        idx,
+        mask: mask & CHILD_MASK,
+      })
+      .boxed()
+  }
+
+  #[test]
+  fn len_eq_no_1s() {
+    assert_eq!(thin_mask(0b000).len(), 0);
+    assert_eq!(thin_mask(0b001).len(), 1);
+    assert_eq!(thin_mask(0b100).len(), 1);
+    assert_eq!(thin_mask(0b011).len(), 2);
+  }
+
+  pub fn thin_children(num: usize) -> BoxedStrategy<ThinNode> {
+    sampled(num..=num, 0..26)
+      .prop_map(|mask| ThinNode { idx: 0, mask })
+      .boxed()
+  }
+
+  pub fn len_node_pair() -> BoxedStrategy<(usize, ThinNode)> {
+    (0..26usize)
+      .prop_flat_map(|num| (Just(num), thin_children(num)))
+      .boxed()
+  }
+
+  proptest! {
+    #[test]
+    fn len_eq_bits((len, node) in len_node_pair()) {
+      assert_eq!(node.len(), len);
+    }
+  }
+
+  #[test]
+  fn only_0_bits_is_empty() {
+    assert!(thin_mask(0b0).is_empty());
+    assert!(!thin_mask(0b001).is_empty());
+    assert!(!thin_mask(0b100).is_empty());
+    assert!(!thin_mask(0b011).is_empty());
+  }
+
+  proptest! {
+    #[test]
+    fn len_0_is_empty(node in thin_node()) {
+      assert_eq!(node.len() == 0, node.is_empty());
+    }
+  }
+
+  proptest! {
+    #[test]
+    fn has_keys(node in thin_node()) {
+      for c in node.keys() {
+        assert!(node.has(c));
+      }
+    }
+
+    #[test]
+    fn get_nonzero(node in thin_node()) {
+      for c in node.keys() {
+        assert_ne!(node.get(c), 0);
+      }
+    }
+
+    #[test]
+    fn keys_match(node in thin_node()) {
+      let keys0: HashSet<_> = node.keys().collect();
+      let keys1: HashSet<_> = (0..26).filter(|&c| node.has(c)).collect();
+      assert_eq!(keys0, keys1);
+    }
   }
 }

@@ -74,3 +74,68 @@ impl<const N: usize> WriteNode for WideNode<N> {
     &mut self.children[c as usize]
   }
 }
+
+#[cfg(test)]
+pub(crate) mod test {
+  use super::{ReadNode, WideNode};
+  use proptest::{bits::u32::sampled, collection::vec, prelude::*, sample::SizeRange};
+  use std::{array, collections::HashSet};
+
+  fn wide_children(num: impl Into<SizeRange>) -> BoxedStrategy<WideNode> {
+    (sampled(num, 0..26), vec(1usize.., 26..=26))
+      .prop_map(|(mask, idxs)| array::from_fn(|i| if (mask >> i) & 1 > 0 { idxs[i] } else { 0 }))
+      .prop_flat_map(|idxs| (any::<bool>(), Just(idxs)))
+      .prop_map(|(end, idxs)| WideNode {
+        end,
+        children: idxs,
+      })
+      .boxed()
+  }
+
+  fn len_node_pair() -> BoxedStrategy<(usize, WideNode)> {
+    (0..=26usize)
+      .prop_flat_map(|num| (Just(num), wide_children(num..=num)))
+      .boxed()
+  }
+
+  pub fn wide_node() -> BoxedStrategy<WideNode> {
+    wide_children(26)
+  }
+
+  proptest! {
+    #[test]
+    fn len_matches((len, node) in len_node_pair()) {
+      assert_eq!(node.len(), len);
+    }
+  }
+
+  proptest! {
+    #[test]
+    fn len_0_is_empty(node in wide_children(26)) {
+      assert_eq!(node.len() == 0, node.is_empty());
+    }
+  }
+
+  proptest! {
+    #[test]
+    fn has_keys(node in wide_children(26)) {
+      for c in node.keys() {
+        assert!(node.has(c));
+      }
+    }
+
+    #[test]
+    fn get_nonzero(node in wide_children(26)) {
+      for c in node.keys() {
+        assert_ne!(node.get(c), 0);
+      }
+    }
+
+    #[test]
+    fn keys_match(node in wide_node()) {
+      let keys0: HashSet<_> = node.keys().collect();
+      let keys1: HashSet<_> = (0..26).filter(|&c| node.has(c)).collect();
+      assert_eq!(keys0, keys1);
+    }
+  }
+}
