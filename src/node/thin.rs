@@ -46,8 +46,8 @@ impl ReadNode for ThinNode {
   }
 
   fn next_c(&self, c: u8) -> Option<u8> {
-    let masked = self.mask & ((1 << c) - 1);
-    (masked > 0).then(|| masked.count_zeros() as u8)
+    let masked = self.mask & !((1 << c) - 1);
+    (masked > 0).then(|| masked.trailing_zeros() as u8)
   }
 }
 
@@ -167,6 +167,13 @@ pub(crate) mod test {
       let keys0: HashSet<_> = node.keys().collect();
       let keys1: HashSet<_> = (0..THIN_CHARS as u8).filter(|&c| node.has(c)).collect();
       assert_eq!(keys0, keys1);
+    }
+
+    /// the `next_c` should return the same as the default implementation
+    #[test]
+    fn next_c_matches((node, c) in (thin_node(), 0u8..THIN_CHARS as u8)) {
+      let next = (c..26).find(|&c| node.has(c));
+      assert_eq!(node.next_c(c), next)
     }
   }
 }
