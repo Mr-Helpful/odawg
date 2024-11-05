@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - id: restore
+        uses: ./.github/actions/build
 
       - name: Build
         run: |
@@ -32,6 +34,7 @@ jobs:
       - id: cache
         name: Cache Build
         uses: actions/cache/save@v4
+        if: steps.restore.outputs.cache-hit != 'true'
         with:
           path: |
             ~/.cargo/bin/
@@ -45,6 +48,8 @@ jobs:
   format:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
@@ -81,7 +86,7 @@ jobs:
   # Tests the ODAWG library
   test:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [format, lint]
 
     steps:
       - name: Checkout
