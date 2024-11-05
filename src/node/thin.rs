@@ -165,7 +165,7 @@ pub(crate) mod test {
     #[test]
     fn keys_match(node in thin_node()) {
       let keys0: HashSet<_> = node.keys().collect();
-      let keys1: HashSet<_> = (0..26).filter(|&c| node.has(c)).collect();
+      let keys1: HashSet<_> = (0..THIN_CHARS as u8).filter(|&c| node.has(c)).collect();
       assert_eq!(keys0, keys1);
     }
   }
