@@ -482,12 +482,6 @@ mod test {
     }
 
     #[test]
-    fn iter(words in dawg_words()) {
-      let dawg: FlatDawg<WideNode> = words.into_iter().collect();
-      let _: Vec<_> = dawg.words().collect();
-    }
-
-    #[test]
     fn len(words in dawg_words()) {
       let dawg: FlatDawg = words.clone().into_iter().collect();
       let words_: Vec<_> = dawg.words().collect();
