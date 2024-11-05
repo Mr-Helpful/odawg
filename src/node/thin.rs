@@ -81,7 +81,7 @@ impl TryFrom<WideNode<26>> for ThinNode {
 
 #[cfg(test)]
 pub(crate) mod test {
-  use super::{ReadNode, ThinNode, CHILD_MASK};
+  use super::{ReadNode, ThinNode, CHILD_MASK, THIN_CHARS};
   use proptest::{bits::u32::sampled, prelude::*};
   use std::collections::HashSet;
 
