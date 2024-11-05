@@ -118,14 +118,14 @@ pub(crate) mod test {
 
   proptest! {
     #[test]
-    fn has_keys(node in wide_children(26)) {
+    fn has_keys(node in wide_node()) {
       for c in node.keys() {
         assert!(node.has(c));
       }
     }
 
     #[test]
-    fn get_nonzero(node in wide_children(26)) {
+    fn get_nonzero(node in wide_node()) {
       for c in node.keys() {
         assert_ne!(node.get(c), 0);
       }
