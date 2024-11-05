@@ -33,14 +33,8 @@ pub trait ReadNode: Sized {
   fn get(&self, c: u8) -> Self::Idx;
 
   /// Helper method for implementing iterators
-  fn next_c(&self, mut c: u8) -> Option<u8> {
-    while (c as usize) < THIN_CHARS {
-      if self.has(c) {
-        return Some(c);
-      }
-      c += 1;
-    }
-    None
+  fn next_c(&self, c: u8) -> Option<u8> {
+    (c..THIN_CHARS as u8).find(|&c| self.has(c))
   }
 
   /// An iterator over keys used to access children
