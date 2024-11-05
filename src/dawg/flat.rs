@@ -486,7 +486,7 @@ mod test {
       let dawg: FlatDawg = words.clone().into_iter().collect();
       let words_: Vec<_> = dawg.words().collect();
 
-      let strings: Vec<_> = words.into_iter().map(into_word).collect();
+      let strings: Vec<_> = dawg.words().map(into_word).collect();
       assert_eq!(dawg.len(), words_.len(), "all words = {strings:?}")
     }
 
