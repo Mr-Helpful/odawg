@@ -26,11 +26,11 @@ __Word list:__
 __Trie Structure__:
 
 ```_
-─┬─ c ─── a ─── t.─── s.
+─┬─ c ─── a ─── t ╾── s ╸
  │
- └─ f ─── a ─┬─ c ─┬─ t. ─── s.
+ └─ f ─── a ─┬─ c ─┬─ t ╾── s ╸
              │     │
-             └─ b. └─ e.─── t.─── s.
+             └─ b ╸└─ e ╾── t ╾── s ╸
 ```
 
 A trie removes the storage requirement for the word prefixes and makes lookup faster as, instead of searching through the entire word list we can check 1 letter at a time, reducing the time to search from O(number of words) (or O(log(number of words)) for binary search) to O(length of search word).
@@ -41,15 +41,15 @@ __Trimmed Trie__:
 
 ```_
 ══╗
-─┬╫ c ─── a ─── t.─── s.
+─┬╫ c ─── a ─── t ╾── s ╸
  │╚══════════════════════════════════╗
- └─ f ─── a ─┬─ c ─┬─ t. ─── s.      ║
+ └─ f ─── a ─┬─ c ─┬─ t ╾── s ╸      ║
 ═════════════╪════╗│                 ║
-             └─ b.║└─ e.─── t.─── s. ║
+             └─ b╺║└─ e ╾── t ╾── s ╸║
                   ╚══════════════════╝
 ```
 
-Once all restrictions have been applied and the resulting trie trimmed down, the words within the trie can be read using a depth first traversal, printing a word whenever an end of word marker (in these examples `.`) is encountered.
+Once all restrictions have been applied and the resulting trie trimmed down, the words within the trie can be read using a depth first traversal, printing a word whenever an end of word marker (in these examples `╸`) is encountered.
 
 [^1]: [Wikipedia article for tries](https://en.wikipedia.org/wiki/Trie)
 [^2]: [Article on DAWG basics](https://jbp.dev/blog/dawg-basics.html)
@@ -61,11 +61,22 @@ A DAWG stands for a Directed Acyclic Word Graph and further addresses the storag
 __DAWG Structure__:
 
 ```_
-─┬─ c ─── a ────┬─────┬── t.─── s.
+─┬─ c ─── a ────┬─────┬── t ╾── s ╸
  │              │     │
- └─ f ─── a ─┬─ c ─── e.
+ └─ f ─── a ─┬─ c ─── e ╸
              │
-             └─ b.
+             └─ b ╸
+```
+
+__Trimmed DAWG__:
+
+```_
+══╗          ╔═════════════════════╗
+─┬╫ c ─── a ─╫──┬─────┬── t ╾── s ╸║
+ │╚══════════╝  │     │            ║
+ └─ f ─── a ─┬─ c ─── e ╸          ║
+═════════════╪═════════════════════╝
+             └─ b ╸
 ```
 
 <!-- cargo-sync-readme end -->
