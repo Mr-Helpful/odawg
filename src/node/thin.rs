@@ -156,6 +156,13 @@ pub(crate) mod test {
     }
 
     #[test]
+    fn not_has_gets_0(node in thin_node()) {
+      for c in (0..THIN_CHARS as u8).filter(|&c| !node.has(c)) {
+        assert_eq!(node.get(c), 0);
+      }
+    }
+
+    #[test]
     fn keys_match(node in thin_node()) {
       let keys0: HashSet<_> = node.keys().collect();
       let keys1: HashSet<_> = (0..26).filter(|&c| node.has(c)).collect();
