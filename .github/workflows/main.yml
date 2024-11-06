@@ -107,8 +107,7 @@ jobs:
 
       - name: Coverage
         run: |
-          cov=$(cargo tarpaulin --out=Html | tee /dev/stderr)
-          cov=$(echo $cov | tail -n 1)
+          cov=$(cargo tarpaulin --out=Html | tee /dev/stderr | tail -n 1)
           echo "::notice title=Test Coverage::$cov"
 
       - name: Upload Coverage
