@@ -23,18 +23,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - id: restore
-        uses: ./.github/actions/build
-
-      - name: Build
-        run: |
-          cargo build --verbose
-          cargo build --release --verbose
 
       - id: cache
         name: Cache Build
-        uses: actions/cache/save@v4
-        if: steps.restore.outputs.cache-hit != 'true'
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/bin/
@@ -43,6 +35,12 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: Build-${{ runner.os }}-${{ hashFiles('**/Cargo.lock', 'src/**') }}
+
+      - name: Build
+        if: ${{ steps.cache.outputs.cache-hit != 'true' }}
+        run: |
+          cargo build --verbose
+          cargo build --release --verbose
 
   # Formats package with `cargo fmt`
   format:
