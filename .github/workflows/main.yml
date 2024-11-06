@@ -106,7 +106,10 @@ jobs:
           tool: cargo-tarpaulin
 
       - name: Coverage
-        run: cargo tarpaulin --out=Html
+        run: |
+          cov=$(cargo tarpaulin --out=Html | tee /dev/stderr)
+          cov=$(echo $cov | tail -n 1)
+          echo "::notice title=Test Coverage::$cov"
 
       - name: Upload Coverage
         uses: actions/upload-artifact@v4
