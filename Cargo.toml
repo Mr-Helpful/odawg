@@ -12,8 +12,6 @@ keywords = ["text", "search", "string", "encoding"]
 categories = ["algorithms", "data-structures", "text-processing"]
 exclude = ["/.github", "/examples", "/proptest-regressions"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 proptest = { version = "1.4.0", features = ["fork", "timeout"] }
 serde = { version = "1.0.210", features = ["serde_derive"] }
