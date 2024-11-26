@@ -73,12 +73,12 @@
 //!              └─ b ╸
 //! ```
 #![warn(
-  missing_docs,
-  clippy::correctness,
-  clippy::suspicious,
-  clippy::complexity,
-  clippy::perf,
-  clippy::style
+    missing_docs,
+    clippy::correctness,
+    clippy::suspicious,
+    clippy::complexity,
+    clippy::perf,
+    clippy::style
 )]
 mod pattern;
 mod utils;
