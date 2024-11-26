@@ -4,15 +4,15 @@
 
 <!-- cargo-sync-readme start -->
 
-A common issue when playing scrabble is finding playable words in
-a given row / column. I've attempted to solve this using the method below.
+A data structure for O(log N) lookup on words,
+whilst using as little space as possible.
 
 ## Tries: eliminating common prefixes
 
 The first approach I came across online was the trie data structure[^1], where a list of words is stored in a trie like data structure.
 This is acheived by identifying common prefixes of the word list. Here's a example (blatantly ripped from the DAWG article[^2]):
 
-__Word list:__
+__Word list__:
 
 - `cat`
 - `cats`
