@@ -9,9 +9,10 @@ impl<const N: usize, D: IndexDawg<Idx = usize>> IndexDawg for AnyDawg<N, D> {
     type Idx = [Option<D::Idx>; N];
     const ROOT_IDX: Self::Idx = [Some(0); N];
 
-    type NodeRef<'a> = AnyNode<N, D::NodeRef<'a>>
+    type NodeRef<'a>
+        = AnyNode<N, D::NodeRef<'a>>
     where
-      Self: 'a;
+        Self: 'a;
     fn index(&self, idxs: [Option<D::Idx>; N]) -> Self::NodeRef<'_> {
         AnyNode(array::from_fn(|i| idxs[i].map(|idx| self.0[i].index(idx))))
     }

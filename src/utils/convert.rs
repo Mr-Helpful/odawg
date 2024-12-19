@@ -42,33 +42,48 @@ pub trait IntoLetters {
 }
 
 impl<I: IntoLetters> IntoLetters for &I {
-    type LetterIter<'b> = I::LetterIter<'b> where Self: 'b;
+    type LetterIter<'b>
+        = I::LetterIter<'b>
+    where
+        Self: 'b;
     fn letters(&self) -> Self::LetterIter<'_> {
         I::letters(self)
     }
 }
 
 impl IntoLetters for &[u8] {
-    type LetterIter<'b> = std::iter::Copied<std::slice::Iter<'b, u8>> where Self: 'b;
+    type LetterIter<'b>
+        = std::iter::Copied<std::slice::Iter<'b, u8>>
+    where
+        Self: 'b;
     fn letters(&self) -> Self::LetterIter<'_> {
         self.iter().copied()
     }
 }
 impl IntoLetters for Vec<u8> {
-    type LetterIter<'b> = std::iter::Copied<std::slice::Iter<'b, u8>> where Self: 'b;
+    type LetterIter<'b>
+        = std::iter::Copied<std::slice::Iter<'b, u8>>
+    where
+        Self: 'b;
     fn letters(&self) -> Self::LetterIter<'_> {
         self.iter().copied()
     }
 }
 
 impl IntoLetters for &str {
-    type LetterIter<'b> = ConvertIter<'b> where Self: 'b;
+    type LetterIter<'b>
+        = ConvertIter<'b>
+    where
+        Self: 'b;
     fn letters(&self) -> Self::LetterIter<'_> {
         ConvertIter(self.chars())
     }
 }
 impl IntoLetters for String {
-    type LetterIter<'b> = ConvertIter<'b> where Self: 'b;
+    type LetterIter<'b>
+        = ConvertIter<'b>
+    where
+        Self: 'b;
     fn letters(&self) -> Self::LetterIter<'_> {
         ConvertIter(self.chars())
     }

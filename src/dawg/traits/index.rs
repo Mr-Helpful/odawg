@@ -20,7 +20,10 @@ pub trait IndexDawg {
 impl<D: IndexDawg> IndexDawg for &D {
     type Idx = D::Idx;
     const ROOT_IDX: Self::Idx = D::ROOT_IDX;
-    type NodeRef<'a> = D::NodeRef<'a> where Self: 'a;
+    type NodeRef<'a>
+        = D::NodeRef<'a>
+    where
+        Self: 'a;
     fn index(&self, idx: Self::Idx) -> Self::NodeRef<'_> {
         <D as IndexDawg>::index(self, idx)
     }
@@ -28,7 +31,10 @@ impl<D: IndexDawg> IndexDawg for &D {
 impl<D: IndexDawg> IndexDawg for &mut D {
     type Idx = D::Idx;
     const ROOT_IDX: Self::Idx = D::ROOT_IDX;
-    type NodeRef<'a> = D::NodeRef<'a> where Self: 'a;
+    type NodeRef<'a>
+        = D::NodeRef<'a>
+    where
+        Self: 'a;
     fn index(&self, idx: Self::Idx) -> Self::NodeRef<'_> {
         <D as IndexDawg>::index(self, idx)
     }
@@ -46,7 +52,10 @@ pub trait IndexMutDawg: IndexDawg {
 }
 
 impl<D: IndexMutDawg> IndexMutDawg for &mut D {
-    type NodeMut<'a> = D::NodeMut<'a> where Self: 'a;
+    type NodeMut<'a>
+        = D::NodeMut<'a>
+    where
+        Self: 'a;
     fn index_mut(&mut self, idx: Self::Idx) -> Self::NodeMut<'_> {
         <D as IndexMutDawg>::index_mut(self, idx)
     }

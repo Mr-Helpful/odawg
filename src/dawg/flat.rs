@@ -73,9 +73,10 @@ mod read {
         type Idx = usize;
         const ROOT_IDX: Self::Idx = 0;
 
-        type NodeRef<'a> = &'a N
-    where
-      Self: 'a;
+        type NodeRef<'a>
+            = &'a N
+        where
+            Self: 'a;
         fn index(&self, idx: Self::Idx) -> Self::NodeRef<'_> {
             &self.0[idx]
         }
@@ -96,9 +97,10 @@ mod write {
     use super::{FlatDawg, IndexDawg, IndexMutDawg, ReadDawg, ReadNode, WriteDawg, WriteNode};
 
     impl<N: WriteNode<Idx = usize>> IndexMutDawg for FlatDawg<N> {
-        type NodeMut<'a> = &'a mut N
-    where
-      Self: 'a;
+        type NodeMut<'a>
+            = &'a mut N
+        where
+            Self: 'a;
         fn index_mut(&mut self, idx: Self::Idx) -> Self::NodeMut<'_> {
             &mut self.0[idx]
         }
