@@ -1,7 +1,7 @@
 mod all;
 pub use all::AllNode;
 mod thin;
-pub use thin::{ThinNode, THIN_CHARS};
+pub use thin::{NonContiguous, ThinNode, THIN_CHARS};
 mod wide;
 pub use wide::WideNode;
 mod any;

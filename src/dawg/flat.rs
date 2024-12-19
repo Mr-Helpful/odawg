@@ -1,3 +1,5 @@
+use crate::node::NonContiguous;
+
 use super::{
     IndexDawg, IndexMutDawg, ReadDawg, ReadNode, ThinNode, WideNode, WordIter, WriteDawg,
     WriteNode, THIN_CHARS,
@@ -445,18 +447,19 @@ impl From<FlatDawg<ThinNode>> for FlatDawg<WideNode<THIN_CHARS>> {
     }
 }
 
-// impl From<FlatDawg<WideNode<THIN_CHARS>>> for FlatDawg<ThinNode> {
-//   fn from(mut value: FlatDawg<WideNode<THIN_CHARS>>) -> Self {
-//     value.trim();
-//     FlatDawg(
-//       value
-//         .0
-//         .into_iter()
-//         .map(|node| node.try_into().expect("nodes should be contiguous"))
-//         .collect(),
-//     )
-//   }
-// }
+impl TryFrom<FlatDawg<WideNode<THIN_CHARS>>> for FlatDawg<ThinNode> {
+    type Error = NonContiguous;
+    fn try_from(mut value: FlatDawg<WideNode<THIN_CHARS>>) -> Result<Self, Self::Error> {
+        value.trim();
+        Ok(FlatDawg(
+            value
+                .0
+                .into_iter()
+                .map(|node| node.try_into())
+                .collect::<Result<_, _>>()?,
+        ))
+    }
+}
 
 #[cfg(test)]
 mod test {
