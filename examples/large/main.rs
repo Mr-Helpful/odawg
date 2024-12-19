@@ -7,7 +7,7 @@ fn main() {
     let dawg_path = file_path.join("Large.dawg");
 
     let content =
-        fs::read_to_string(words_path).expect("Should be able to read words file as text");
+        fs::read_to_string(&words_path).expect("Should be able to read words file as text");
 
     let mut dawg: FlatDawg<WideNode> = content.split("\n").map(from_word).collect();
 
@@ -24,5 +24,19 @@ fn main() {
     println!("Dawg has {} nodes", dawg.0.len());
 
     let bytes = bincode::serialize(&dawg).expect("serialisation should succeed");
-    fs::write(dawg_path, bytes).expect("Should be able to write file")
+    fs::write(&dawg_path, bytes).expect("Should be able to write file");
+    println!(
+        "Text file: {:.2}MB",
+        fs::metadata(words_path)
+            .expect("Should be able to access path")
+            .len() as f64
+            / 1_000_000.0
+    );
+    println!(
+        "Dawg file: {:.2}MB",
+        fs::metadata(dawg_path)
+            .expect("Should be able to access path")
+            .len() as f64
+            / 1_000_000.0
+    )
 }
