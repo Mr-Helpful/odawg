@@ -19,7 +19,7 @@ impl<'a> Letter<'a> {
     }
 }
 
-impl<'a> Letter<'a> {
+impl Letter<'_> {
     pub(crate) fn fmt_range(
         start: u8,
         end: u8,
@@ -38,7 +38,7 @@ impl<'a> Letter<'a> {
     }
 }
 
-impl<'a> Display for Letter<'a> {
+impl Display for Letter<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let Some(node) = self.0 else {
             return Ok(());
@@ -83,11 +83,11 @@ impl<'a> Display for Letter<'a> {
 
 pub const CHILD_MASK: u32 = (1 << ALPHA_CHARS) - 1;
 
-impl<'a> ReadNode for Letter<'a> {
+impl ReadNode for Letter<'_> {
     type Idx = usize;
 
     fn is_empty(&self) -> bool {
-        !self.0.is_some_and(|node| (node.mask & CHILD_MASK) > 0)
+        self.0.is_none_or(|node| node.mask & CHILD_MASK == 0)
     }
     fn is_end(&self) -> bool {
         self.0.is_none()

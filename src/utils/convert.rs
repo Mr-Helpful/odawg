@@ -91,7 +91,7 @@ impl IntoLetters for String {
 
 pub struct ConvertIter<'a>(std::str::Chars<'a>);
 
-impl<'a> Iterator for ConvertIter<'a> {
+impl Iterator for ConvertIter<'_> {
     type Item = u8;
     fn next(&mut self) -> Option<Self::Item> {
         self.0.next().map(from_alpha)
